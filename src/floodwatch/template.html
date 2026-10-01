@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Flood Watch Thailand | ฝนพยากรณ์และข่าวน้ำท่วมรายจังหวัด</title>
+<meta name="description" content="ดูฝนพยากรณ์ ระดับสถานการณ์ และข่าวน้ำท่วมของทั้ง 77 จังหวัด พร้อมสรุปภาพรวมทั่วประเทศ">
+<style>
+:root{
+  --bg:#f5f5f3;--surface:#ffffff;--surface-2:#f1f0ed;--border:rgba(0,0,0,.12);
+  --text:#1f1f1d;--text-2:#5f5e5a;--text-3:#767570;--acc:#2a78d6;--grid:rgba(0,0,0,.08);
+  --ok-bg:#e6f4ea;--ok:#1e6b3a;--warn-bg:#fdf0d5;--warn:#8a5a00;--bad-bg:#fbe3e1;--bad:#a12b22;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#1a1a19;--surface:#262624;--surface-2:#30302e;--border:rgba(255,255,255,.14);
+    --text:#ececea;--text-2:#b4b2aa;--text-3:#9a988f;--acc:#5aa0f0;--grid:rgba(255,255,255,.1);
+    --ok-bg:#1f3a2a;--ok:#8fd6a6;--warn-bg:#3d3018;--warn:#f0c36a;--bad-bg:#4a2220;--bad:#f19a93;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,"Segoe UI","Noto Sans Thai",Tahoma,sans-serif;font-size:15px;line-height:1.65}
+a{color:var(--acc)}
+.wrap{max-width:780px;margin:0 auto;padding:0 16px 48px}
+.lbl{font-size:12px;color:var(--text-2)}
+h1,h2,h3{margin:0}
+header.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:18px 0 14px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{color:var(--acc)}
+.brand h1{font-size:19px;font-weight:600;line-height:1.3}
+.brand p{margin:0;font-size:12px;color:var(--text-2)}
+.notice{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:8px;font-size:13px;line-height:1.6;background:color-mix(in srgb,var(--acc) 12%,transparent);border:.5px solid color-mix(in srgb,var(--acc) 40%,transparent)}
+.notice svg{flex-shrink:0;color:var(--acc);margin-top:2px}
+section{margin-top:28px}
+.sec-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;margin-bottom:10px}
+.sec-title svg{color:var(--acc)}
+.card{background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:16px 18px}
+.summary p{margin:0 0 8px}
+.summary p:last-child{margin-bottom:0}
+.counts{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:14px;padding-top:12px;border-top:.5px solid var(--border)}
+.count{display:flex;align-items:center;gap:8px;font-size:14px}
+.count strong{font-size:18px;font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:2px 8px;border-radius:8px;white-space:nowrap}
+.lv-normal{background:var(--ok-bg);color:var(--ok)}
+.lv-watch{background:var(--warn-bg);color:var(--warn)}
+.lv-alert{background:var(--bad-bg);color:var(--bad)}
+.pick{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.pick label{font-size:13px;color:var(--text-2)}
+select{flex:1;min-width:200px;max-width:340px;font:inherit;color:var(--text);background:var(--surface);border:.5px solid var(--border);border-radius:8px;padding:8px 10px}
+select:focus-visible,.zc:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.zc{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:10px 14px;transition:border-color .15s,transform .15s,background .15s}
+.zc:hover{border-color:var(--acc);transform:translateY(-2px)}
+.zc[aria-pressed=true]{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 8%,var(--surface))}
+.zc .row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-weight:600}
+.zc .go{opacity:0;transition:opacity .15s;color:var(--acc)}
+.zc:hover .go,.zc[aria-pressed=true] .go{opacity:1}
+.zc .row2{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#zpanel{margin-top:12px}
+.phead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.phead h3{font-size:17px;font-weight:600}
+.cells{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.cell{background:var(--surface-2);border-radius:8px;padding:10px 12px}
+.cell .v{font-size:20px;font-weight:600;line-height:1.4}
+.cell .u{font-size:13px;font-weight:400;color:var(--text-2)}
+.bars{display:flex;gap:6px;align-items:flex-end;height:96px;margin-bottom:6px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0}
+.bar .n{font-size:11px;color:var(--text-2);line-height:1.2;margin-bottom:2px}
+.bar .col{width:100%;background:var(--acc);opacity:.85;border-radius:4px 4px 0 0}
+.bar .d{font-size:11px;color:var(--text-3);margin-top:4px;line-height:1.2;white-space:nowrap}
+.bars-wrap{margin-bottom:12px}
+.criteria{font-size:12px;color:var(--text-2);margin:0 0 14px}
+.sub{font-size:13px;font-weight:600;margin:0 0 2px}
+.news{display:block}
+.nrow{padding:10px 0;border-top:.5px solid var(--border)}
+.nrow .ntitle{display:block;line-height:1.5}
+.nrow .meta{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text-2);margin-top:2px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text-2)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:18px;border-top-width:2px}
+.chartbox{position:relative;width:100%;height:220px}
+.charthead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+footer{margin-top:36px;padding-top:16px;border-top:.5px solid var(--border);font-size:12px;line-height:1.8;color:var(--text-2)}
+footer p{margin:0 0 6px}
+@media (prefers-reduced-motion:reduce){.zc,.zc .go{transition:none}.zc:hover{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.2 6 10.5a6 6 0 0 1-12 0C6 9.2 12 3 12 3z"/></svg>
+      <div>
+        <h1>Flood Watch Thailand</h1>
+        <p>ฝนพยากรณ์และข่าวน้ำท่วมรายจังหวัด</p>
+      </div>
+    </div>
+    <span class="lbl">อัปเดต {{UPDATED}}</span>
+  </header>
+
+  <div class="notice">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+    <span>สรุปโดย AI จากหัวข้อข่าวและข้อมูลโมเดล ไม่ใช่ประกาศทางการ กรุณาตรวจสอบกับหน่วยงานที่เกี่ยวข้องก่อนตัดสินใจ</span>
+  </div>
+
+  <noscript><p class="card" style="margin-top:16px">หน้านี้ต้องเปิดใช้ JavaScript เพื่อแสดงข้อมูลรายจังหวัด</p></noscript>
+
+  <section>
+    <div class="card summary">
+      <div class="sec-title" style="margin-bottom:8px">สรุปสถานการณ์ทั่วประเทศ</div>
+      {{SUMMARY}}
+      <div class="counts" id="counts" aria-label="จำนวนจังหวัดแยกตามระดับสถานการณ์"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+      ดูสถานการณ์รายจังหวัด
+    </div>
+    <div class="pick">
+      <label for="prov">เลือกจังหวัด (77 จังหวัด)</label>
+      <select id="prov"></select>
+    </div>
+    <div class="lbl" style="margin-bottom:6px">ทางลัด: กรุงเทพและปริมณฑล</div>
+    <div class="quick" id="quick"></div>
+    <div class="card" id="zpanel" aria-live="polite"></div>
+  </section>
+
+  <section id="river-section" hidden>
+    <div class="charthead">
+      <span class="sec-title" style="margin:0">ปริมาณน้ำในแม่น้ำพยากรณ์ 7 วัน (m³/s)</span>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="card">
+      <div class="chartbox"><canvas id="riverChart" role="img" aria-label="กราฟเส้นปริมาณน้ำในแม่น้ำพยากรณ์ 7 วัน">ไม่สามารถแสดงกราฟได้</canvas></div>
+      <p class="criteria" style="margin:10px 0 0">ค่าจากโมเดล GloFAS ณ จุดกริดใกล้ตัวเมือง ไม่ใช่ค่าที่วัดจากสถานี</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">ข่าวน้ำท่วมล่าสุด</div>
+    <div class="card" id="news-all"></div>
+  </section>
+
+  <footer>
+    <p>ฝนพยากรณ์และปริมาณน้ำ: ข้อมูลจาก <a href="https://open-meteo.com/">Open-Meteo.com</a> (ฝนจากโมเดลพยากรณ์อากาศ ปริมาณน้ำในแม่น้ำจากโมเดล GloFAS)</p>
+    <p>ข่าว: แสดงเฉพาะหัวข้อพร้อมลิงก์ไปยังต้นฉบับ รวบรวมจาก Google News ส่วนสรุปภาพรวมสร้างโดย Gemini</p>
+    <p>ระดับ ปกติ / เฝ้าระวัง / เตือนภัย คำนวณจากฝนพยากรณ์รายวันตามเกณฑ์ของโปรเจกต์นี้ ไม่ใช่การประกาศเตือนภัยอย่างเป็นทางการ</p>
+    <p>ข้อมูลทางการ: <a href="https://www.disaster.go.th">กรมป้องกันและบรรเทาสาธารณภัย</a> · <a href="https://www.rid.go.th">กรมชลประทาน</a> · <a href="https://www.tmd.go.th">กรมอุตุนิยมวิทยา</a></p>
+    <p>ซอร์สโค้ด: <a href="https://github.com/ppeanaths/flood-watch-th">github.com/ppeanaths/flood-watch-th</a></p>
+  </footer>
+</div>
+
+<script id="data" type="application/json">{{DATA_JSON}}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+(function () {
+  var DATA = JSON.parse(document.getElementById('data').textContent);
+  var NS = 'http://www.w3.org/2000/svg';
+  var ICON = {
+    check: '<circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/>',
+    eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    alert: '<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/>',
+    chevron: '<path d="M9 6l6 6-6 6"/>'
+  };
+  var LEVELS = {
+    normal: ['ปกติ', 'check'],
+    watch: ['เฝ้าระวัง', 'eye'],
+    alert: ['เตือนภัย', 'alert']
+  };
+  var QUICK = ['กรุงเทพมหานคร', 'นนทบุรี', 'ปทุมธานี', 'สมุทรปราการ', 'นครปฐม', 'สมุทรสาคร'];
+
+  function h(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined && text !== null) e.textContent = text;
+    return e;
+  }
+
+  function icon(name, size) {
+    var s = document.createElementNS(NS, 'svg');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('width', size || 16);
+    s.setAttribute('height', size || 16);
+    s.setAttribute('fill', 'none');
+    s.setAttribute('stroke', 'currentColor');
+    s.setAttribute('stroke-width', '2');
+    s.setAttribute('stroke-linecap', 'round');
+    s.setAttribute('stroke-linejoin', 'round');
+    s.setAttribute('aria-hidden', 'true');
+    s.innerHTML = ICON[name];
+    return s;
+  }
+
+  function pill(level) {
+    var p = h('span', 'pill lv-' + level);
+    p.appendChild(icon(LEVELS[level][1], 14));
+    p.appendChild(document.createTextNode(LEVELS[level][0]));
+    return p;
+  }
+
+  function newsList(list, emptyText) {
+    var wrap = h('div', 'news');
+    if (!list || !list.length) {
+      wrap.appendChild(h('p', 'lbl', emptyText));
+      return wrap;
+    }
+    list.forEach(function (a) {
+      var row = h('div', 'nrow');
+      var t;
+      if (a.link) {
+        t = h('a', 'ntitle', a.title);
+        t.href = a.link;
+        t.target = '_blank';
+        t.rel = 'noopener noreferrer';
+      } else {
+        t = h('span', 'ntitle', a.title);
+      }
+      row.appendChild(t);
+      if (a.source || a.published) {
+        var meta = h('div', 'meta');
+        if (a.source) meta.appendChild(h('span', null, a.source));
+        if (a.published) meta.appendChild(h('span', null, a.published));
+        row.appendChild(meta);
+      }
+      wrap.appendChild(row);
+    });
+    return wrap;
+  }
+
+  var provinces = DATA.provinces;
+  var BY = {};
+  provinces.forEach(function (p) { BY[p.name] = p; });
+
+  /* จำนวนจังหวัดแยกตามระดับ */
+  var counts = { alert: 0, watch: 0, normal: 0 };
+  provinces.forEach(function (p) { counts[p.level] += 1; });
+  var countsBox = document.getElementById('counts');
+  ['alert', 'watch', 'normal'].forEach(function (lv) {
+    var c = h('div', 'count');
+    c.appendChild(pill(lv));
+    c.appendChild(h('strong', null, counts[lv]));
+    c.appendChild(h('span', 'lbl', 'จังหวัด'));
+    countsBox.appendChild(c);
+  });
+
+  /* เมนูเลือกจังหวัด แยกกลุ่มตามภาค */
+  var sel = document.getElementById('prov');
+  var groups = {};
+  provinces.forEach(function (p) {
+    (groups[p.region] = groups[p.region] || []).push(p.name);
+  });
+  Object.keys(groups).forEach(function (region) {
+    var g = document.createElement('optgroup');
+    g.label = region;
+    groups[region].forEach(function (n) {
+      var o = document.createElement('option');
+      o.value = n;
+      o.textContent = n;
+      g.appendChild(o);
+    });
+    sel.appendChild(g);
+  });
+
+  /* ทางลัดกรุงเทพและปริมณฑล */
+  var quick = document.getElementById('quick');
+  QUICK.forEach(function (name) {
+    var p = BY[name];
+    if (!p) return;
+    var b = h('button', 'zc');
+    b.type = 'button';
+    b.dataset.n = name;
+    b.setAttribute('aria-pressed', 'false');
+    var r1 = h('div', 'row1');
+    r1.appendChild(h('span', null, name));
+    var go = icon('chevron', 16);
+    go.setAttribute('class', 'go');
+    r1.appendChild(go);
+    var r2 = h('div', 'row2');
+    r2.appendChild(pill(p.level));
+    r2.appendChild(h('span', 'lbl', 'ฝน ' + p.rain + ' มม.'));
+    b.appendChild(r1);
+    b.appendChild(r2);
+    b.addEventListener('click', function () { showProvince(name, true); });
+    quick.appendChild(b);
+  });
+
+  function cell(label, value, unit) {
+    var c = h('div', 'cell');
+    c.appendChild(h('div', 'lbl', label));
+    var v = h('div', 'v', value);
+    if (unit) {
+      v.appendChild(document.createTextNode(' '));
+      v.appendChild(h('span', 'u', unit));
+    }
+    c.appendChild(v);
+    return c;
+  }
+
+  function showProvince(name, push) {
+    var p = BY[name];
+    if (!p) return;
+    sel.value = name;
+    document.querySelectorAll('.zc').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.dataset.n === name ? 'true' : 'false');
+    });
+    if (push) {
+      try { history.replaceState(null, '', '#' + encodeURIComponent(name)); } catch (e) {}
+    }
+
+    var panel = document.getElementById('zpanel');
+    panel.replaceChildren();
+
+    var head = h('div', 'phead');
+    head.appendChild(h('h3', null, name));
+    head.appendChild(h('span', 'lbl', p.region));
+    head.appendChild(pill(p.level));
+    panel.appendChild(head);
+
+    var cells = h('div', 'cells');
+    cells.appendChild(cell('ฝนพยากรณ์วันนี้', p.rain, 'มม.'));
+    cells.appendChild(cell('โอกาสฝนตกสูงสุดวันนี้', p.prob, '%'));
+    cells.appendChild(cell('แนวโน้มฝน 7 วัน', p.trend, ''));
+    panel.appendChild(cells);
+
+    var max = Math.max.apply(null, p.rain7.concat([1]));
+    var barsWrap = h('div', 'bars-wrap');
+    var bars = h('div', 'bars');
+    bars.setAttribute('role', 'img');
+    bars.setAttribute('aria-label', 'ฝนพยากรณ์ 7 วัน (มม.): ' + p.rain7.map(function (v, i) {
+      return DATA.dayLabels[i] + ' ' + v;
+    }).join(', '));
+    p.rain7.forEach(function (v, i) {
+      var b = h('div', 'bar');
+      b.appendChild(h('span', 'n', v));
+      var col = h('span', 'col');
+      col.style.height = Math.max(3, Math.round(v / max * 52)) + 'px';
+      b.appendChild(col);
+      b.appendChild(h('span', 'd', DATA.dayLabels[i]));
+      bars.appendChild(b);
+    });
+    barsWrap.appendChild(bars);
+    panel.appendChild(barsWrap);
+
+    var th = DATA.thresholds;
+    panel.appendChild(h('p', 'criteria',
+      'ระดับคำนวณจากฝนพยากรณ์วันนี้ตามเกณฑ์ของโปรเจกต์นี้: ต่ำกว่า ' + th.watch + ' มม. = ปกติ, ' +
+      th.watch + ' ถึงต่ำกว่า ' + th.alert + ' มม. = เฝ้าระวัง, ตั้งแต่ ' + th.alert +
+      ' มม. = เตือนภัย (ไม่ใช่ประกาศเตือนภัยอย่างเป็นทางการ)'));
+
+    panel.appendChild(h('div', 'sub', 'ข่าวเกี่ยวกับ' + name + ' (3 วันล่าสุด)'));
+    panel.appendChild(newsList(p.news, 'ไม่พบข่าวน้ำท่วมของจังหวัดนี้ในช่วง 3 วันล่าสุด หรือรอบนี้ยังไม่ได้ดึงข่าวรายจังหวัด'));
+  }
+
+  sel.addEventListener('change', function () { showProvince(sel.value, true); });
+
+  var start = 'กรุงเทพมหานคร';
+  try {
+    var fromHash = decodeURIComponent(location.hash.slice(1));
+    if (BY[fromHash]) start = fromHash;
+  } catch (e) {}
+  showProvince(start, false);
+
+  /* ข่าวภาพรวม */
+  document.getElementById('news-all').appendChild(newsList(DATA.news, 'ยังไม่มีข่าวในรอบนี้'));
+
+  /* กราฟปริมาณน้ำในแม่น้ำ */
+  var rivers = DATA.rivers;
+  if (rivers && rivers.series && rivers.series.length && typeof Chart !== 'undefined') {
+    document.getElementById('river-section').hidden = false;
+    var DASH = [[], [6, 4], [2, 3]];
+    var DASH_CSS = ['solid', 'dashed', 'dotted'];
+    var COLORS = [null, '#eb6834', '#8b6cf0'];
+
+    function themeColors() {
+      var cs = getComputedStyle(document.documentElement);
+      return {
+        text: cs.getPropertyValue('--text-3').trim(),
+        grid: cs.getPropertyValue('--grid').trim(),
+        acc: cs.getPropertyValue('--acc').trim()
+      };
+    }
+    var tc = themeColors();
+    function colorOf(i) { return COLORS[i] || tc.acc; }
+
+    var legend = document.getElementById('legend');
+    rivers.series.forEach(function (s, i) {
+      var item = document.createElement('span');
+      var sw = document.createElement('i');
+      sw.style.borderTopStyle = DASH_CSS[i] || 'solid';
+      sw.style.borderTopColor = COLORS[i] || 'var(--acc)';
+      item.appendChild(sw);
+      item.appendChild(document.createTextNode(s.name));
+      legend.appendChild(item);
+    });
+
+    var chart = new Chart(document.getElementById('riverChart'), {
+      type: 'line',
+      data: {
+        labels: rivers.labels,
+        datasets: rivers.series.map(function (s, i) {
+          return {
+            label: s.name,
+            data: s.values,
+            borderColor: colorOf(i),
+            backgroundColor: colorOf(i),
+            borderWidth: 2,
+            borderDash: DASH[i] || [],
+            pointRadius: 3,
+            tension: 0.3
+          };
+        })
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: tc.text, font: { size: 11 } }, grid: { display: false } },
+          y: {
+            ticks: { color: tc.text, font: { size: 11 }, callback: function (v) { return v.toLocaleString(); } },
+            grid: { color: tc.grid }
+          }
+        }
+      }
+    });
+
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    mq.addEventListener('change', function () {
+      var t = themeColors();
+      chart.options.scales.x.ticks.color = t.text;
+      chart.options.scales.y.ticks.color = t.text;
+      chart.options.scales.y.grid.color = t.grid;
+      chart.data.datasets[0].borderColor = t.acc;
+      chart.data.datasets[0].backgroundColor = t.acc;
+      chart.update();
+    });
+  }
+})();
+</script>
+</body>
+</html>
