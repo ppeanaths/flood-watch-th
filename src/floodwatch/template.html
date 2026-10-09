@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>Flood Watch Thailand | ฝนพยากรณ์และข่าวน้ำท่วมรายจังหวัด</title>
-<meta name="description" content="ดูฝนพยากรณ์ ระดับสถานการณ์ และข่าวน้ำท่วมของทั้ง 77 จังหวัด พร้อมสรุปภาพรวมทั่วประเทศ">
+<meta name="description" content="ดูฝนพยากรณ์ ฝนสะสม และข่าวน้ำท่วมของทั้ง 77 จังหวัด พร้อมสรุปภาพรวมทั่วประเทศ">
 <style>
 :root{
   --bg:#f5f5f3;--surface:#ffffff;--surface-2:#f1f0ed;--border:rgba(0,0,0,.12);
@@ -46,10 +46,13 @@ section{margin-top:28px}
 .lv-normal{background:var(--ok-bg);color:var(--ok)}
 .lv-watch{background:var(--warn-bg);color:var(--warn)}
 .lv-alert{background:var(--bad-bg);color:var(--bad)}
+.lv-news{background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--text)}
+.lv-news svg{color:var(--acc)}
+.note{font-size:12px;color:var(--text-2);margin:10px 0 0;line-height:1.7}
 .pick{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 .pick label{font-size:13px;color:var(--text-2)}
 select{flex:1;min-width:200px;max-width:340px;font:inherit;color:var(--text);background:var(--surface);border:.5px solid var(--border);border-radius:8px;padding:8px 10px}
-select:focus-visible,.zc:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+select:focus-visible,.zc:focus-visible,.chip:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
 .zc{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:10px 14px;transition:border-color .15s,transform .15s,background .15s}
 .zc:hover{border-color:var(--acc);transform:translateY(-2px)}
@@ -58,21 +61,29 @@ select:focus-visible,.zc:focus-visible,a:focus-visible{outline:2px solid var(--a
 .zc .go{opacity:0;transition:opacity .15s;color:var(--acc)}
 .zc:hover .go,.zc[aria-pressed=true] .go{opacity:1}
 .zc .row2{display:flex;justify-content:space-between;align-items:center;gap:8px}
-#zpanel{margin-top:12px}
-.phead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{font:inherit;font-size:13px;line-height:1.4;color:var(--text);cursor:pointer;background:var(--surface);border:.5px solid var(--border);border-radius:999px;padding:3px 11px;transition:border-color .15s,background .15s}
+.chip:hover{border-color:var(--acc)}
+.chip[aria-pressed=true]{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,var(--surface))}
+#newsprov{margin-top:16px}
+#zpanel{margin-top:14px}
+.phead{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;margin-bottom:12px}
 .phead h3{font-size:17px;font-weight:600}
 .cells{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
 .cell{background:var(--surface-2);border-radius:8px;padding:10px 12px}
 .cell .v{font-size:20px;font-weight:600;line-height:1.4}
 .cell .u{font-size:13px;font-weight:400;color:var(--text-2)}
-.bars{display:flex;gap:6px;align-items:flex-end;height:96px;margin-bottom:6px}
+.bars{display:flex;gap:4px;align-items:flex-end;height:104px;margin-bottom:6px}
 .bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0}
-.bar .n{font-size:11px;color:var(--text-2);line-height:1.2;margin-bottom:2px}
-.bar .col{width:100%;background:var(--acc);opacity:.85;border-radius:4px 4px 0 0}
-.bar .d{font-size:11px;color:var(--text-3);margin-top:4px;line-height:1.2;white-space:nowrap}
-.bars-wrap{margin-bottom:12px}
-.criteria{font-size:12px;color:var(--text-2);margin:0 0 14px}
-.sub{font-size:13px;font-weight:600;margin:0 0 2px}
+.bar .n{font-size:10px;color:var(--text-2);line-height:1.2;margin-bottom:2px}
+.bar .col{width:100%;background:var(--acc);border-radius:4px 4px 0 0}
+.bar.past .col{opacity:.35}
+.bar.today .col,.bar.future .col{opacity:.9}
+.bar .d{display:flex;flex-direction:column;align-items:center;margin-top:4px;line-height:1.15;color:var(--text-3)}
+.bar .dd{font-size:12px}
+.bar .dm{font-size:10px}
+.bar.today .d{color:var(--text);font-weight:600}
+.sub{font-size:13px;font-weight:600;margin:14px 0 2px}
 .news{display:block}
 .nrow{padding:10px 0;border-top:.5px solid var(--border)}
 .nrow .ntitle{display:block;line-height:1.5}
@@ -84,7 +95,7 @@ select:focus-visible,.zc:focus-visible,a:focus-visible{outline:2px solid var(--a
 .charthead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
 footer{margin-top:36px;padding-top:16px;border-top:.5px solid var(--border);font-size:12px;line-height:1.8;color:var(--text-2)}
 footer p{margin:0 0 6px}
-@media (prefers-reduced-motion:reduce){.zc,.zc .go{transition:none}.zc:hover{transform:none}}
+@media (prefers-reduced-motion:reduce){.zc,.zc .go,.chip{transition:none}.zc:hover{transform:none}}
 </style>
 </head>
 <body>
@@ -111,7 +122,8 @@ footer p{margin:0 0 6px}
     <div class="card summary">
       <div class="sec-title" style="margin-bottom:8px">สรุปสถานการณ์ทั่วประเทศ</div>
       {{SUMMARY}}
-      <div class="counts" id="counts" aria-label="จำนวนจังหวัดแยกตามระดับสถานการณ์"></div>
+      <div class="counts" id="counts" aria-label="จำนวนจังหวัดแยกตามระดับฝนและจำนวนจังหวัดที่มีข่าว"></div>
+      <p class="note">ระดับฝนวัดจากปริมาณฝนพยากรณ์เท่านั้น ไม่ได้บอกว่าพื้นที่กำลังน้ำท่วมหรือไม่ จังหวัดที่ฝนไม่หนักอาจยังมีน้ำท่วมจากฝนก่อนหน้าหรือน้ำจากพื้นที่อื่น โปรดอ่านร่วมกับข่าวและประกาศทางการ</p>
     </div>
   </section>
 
@@ -126,6 +138,10 @@ footer p{margin:0 0 6px}
     </div>
     <div class="lbl" style="margin-bottom:6px">ทางลัด: กรุงเทพและปริมณฑล</div>
     <div class="quick" id="quick"></div>
+    <div id="newsprov" hidden>
+      <div class="lbl" id="newsprov-label"></div>
+      <div class="chips" id="newsprov-chips"></div>
+    </div>
     <div class="card" id="zpanel" aria-live="polite"></div>
   </section>
 
@@ -136,7 +152,7 @@ footer p{margin:0 0 6px}
     </div>
     <div class="card">
       <div class="chartbox"><canvas id="riverChart" role="img" aria-label="กราฟเส้นปริมาณน้ำในแม่น้ำพยากรณ์ 7 วัน">ไม่สามารถแสดงกราฟได้</canvas></div>
-      <p class="criteria" style="margin:10px 0 0">ค่าจากโมเดล GloFAS ณ จุดกริดใกล้ตัวเมือง ไม่ใช่ค่าที่วัดจากสถานี</p>
+      <p class="note">ค่าจากโมเดล GloFAS ณ จุดกริดใกล้ตัวเมือง ไม่ใช่ค่าที่วัดจากสถานี</p>
     </div>
   </section>
 
@@ -146,9 +162,9 @@ footer p{margin:0 0 6px}
   </section>
 
   <footer>
-    <p>ฝนพยากรณ์และปริมาณน้ำ: ข้อมูลจาก <a href="https://open-meteo.com/">Open-Meteo.com</a> (ฝนจากโมเดลพยากรณ์อากาศ ปริมาณน้ำในแม่น้ำจากโมเดล GloFAS)</p>
-    <p>ข่าว: แสดงเฉพาะหัวข้อพร้อมลิงก์ไปยังต้นฉบับ รวบรวมจาก Google News ส่วนสรุปภาพรวมสร้างโดย Gemini</p>
-    <p>ระดับ ปกติ / เฝ้าระวัง / เตือนภัย คำนวณจากฝนพยากรณ์รายวันตามเกณฑ์ของโปรเจกต์นี้ ไม่ใช่การประกาศเตือนภัยอย่างเป็นทางการ</p>
+    <p>ฝนและปริมาณน้ำ: ข้อมูลจาก <a href="https://open-meteo.com/">Open-Meteo.com</a> ฝนพยากรณ์และฝนย้อนหลังเป็นค่าจากโมเดลพยากรณ์อากาศ ไม่ใช่ปริมาณฝนที่วัดจริง ปริมาณน้ำในแม่น้ำมาจากโมเดล GloFAS</p>
+    <p>ข่าว: แสดงเฉพาะหัวข้อพร้อมลิงก์ไปยังต้นฉบับ รวบรวมจาก Google News ข่าวรายจังหวัดแสดงเฉพาะหัวข้อที่ระบุชื่อจังหวัด ส่วนสรุปภาพรวมสร้างโดย Gemini จากหัวข้อข่าวและตัวเลขข้างต้น จึงอาจคลาดเคลื่อนได้</p>
+    <p>ระดับฝนหนัก / ฝนหนักมาก คำนวณจากฝนพยากรณ์วันนี้หรือฝนสะสม 3 วัน ตามเกณฑ์ของโปรเจกต์นี้ ไม่ใช่การประกาศเตือนภัยอย่างเป็นทางการ</p>
     <p>ข้อมูลทางการ: <a href="https://www.disaster.go.th">กรมป้องกันและบรรเทาสาธารณภัย</a> · <a href="https://www.rid.go.th">กรมชลประทาน</a> · <a href="https://www.tmd.go.th">กรมอุตุนิยมวิทยา</a></p>
     <p>ซอร์สโค้ด: <a href="https://github.com/ppeanaths/flood-watch-th">github.com/ppeanaths/flood-watch-th</a></p>
   </footer>
@@ -164,12 +180,13 @@ footer p{margin:0 0 6px}
     check: '<circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/>',
     eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
     alert: '<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/>',
-    chevron: '<path d="M9 6l6 6-6 6"/>'
+    chevron: '<path d="M9 6l6 6-6 6"/>',
+    news: '<path d="M5 5h11v14H7a2 2 0 0 1-2-2z"/><path d="M16 9h3v8a2 2 0 0 1-2 2M8 9h5M8 13h5"/>'
   };
   var LEVELS = {
-    normal: ['ปกติ', 'check'],
-    watch: ['เฝ้าระวัง', 'eye'],
-    alert: ['เตือนภัย', 'alert']
+    normal: ['ฝนไม่หนัก', 'check'],
+    watch: ['ฝนหนัก', 'eye'],
+    alert: ['ฝนหนักมาก', 'alert']
   };
   var QUICK = ['กรุงเทพมหานคร', 'นนทบุรี', 'ปทุมธานี', 'สมุทรปราการ', 'นครปฐม', 'สมุทรสาคร'];
 
@@ -199,6 +216,13 @@ footer p{margin:0 0 6px}
     var p = h('span', 'pill lv-' + level);
     p.appendChild(icon(LEVELS[level][1], 14));
     p.appendChild(document.createTextNode(LEVELS[level][0]));
+    return p;
+  }
+
+  function newsPill(text) {
+    var p = h('span', 'pill lv-news');
+    p.appendChild(icon('news', 14));
+    p.appendChild(document.createTextNode(text));
     return p;
   }
 
@@ -234,8 +258,9 @@ footer p{margin:0 0 6px}
   var provinces = DATA.provinces;
   var BY = {};
   provinces.forEach(function (p) { BY[p.name] = p; });
+  var withNews = provinces.filter(function (p) { return p.news && p.news.length; });
 
-  /* จำนวนจังหวัดแยกตามระดับ */
+  /* จำนวนจังหวัดแยกตามระดับฝน และจังหวัดที่มีข่าว */
   var counts = { alert: 0, watch: 0, normal: 0 };
   provinces.forEach(function (p) { counts[p.level] += 1; });
   var countsBox = document.getElementById('counts');
@@ -246,20 +271,27 @@ footer p{margin:0 0 6px}
     c.appendChild(h('span', 'lbl', 'จังหวัด'));
     countsBox.appendChild(c);
   });
+  if (DATA.newsFetched) {
+    var cn = h('div', 'count');
+    cn.appendChild(newsPill('มีข่าวน้ำท่วม'));
+    cn.appendChild(h('strong', null, withNews.length));
+    cn.appendChild(h('span', 'lbl', 'จังหวัด'));
+    countsBox.appendChild(cn);
+  }
 
   /* เมนูเลือกจังหวัด แยกกลุ่มตามภาค */
   var sel = document.getElementById('prov');
   var groups = {};
   provinces.forEach(function (p) {
-    (groups[p.region] = groups[p.region] || []).push(p.name);
+    (groups[p.region] = groups[p.region] || []).push(p);
   });
   Object.keys(groups).forEach(function (region) {
     var g = document.createElement('optgroup');
     g.label = region;
-    groups[region].forEach(function (n) {
+    groups[region].forEach(function (p) {
       var o = document.createElement('option');
-      o.value = n;
-      o.textContent = n;
+      o.value = p.name;
+      o.textContent = p.name + (p.news && p.news.length ? ' · มีข่าว' : '');
       g.appendChild(o);
     });
     sel.appendChild(g);
@@ -288,6 +320,22 @@ footer p{margin:0 0 6px}
     quick.appendChild(b);
   });
 
+  /* จังหวัดที่พบข่าวน้ำท่วมใน 3 วันล่าสุด */
+  if (DATA.newsFetched && withNews.length) {
+    document.getElementById('newsprov').hidden = false;
+    document.getElementById('newsprov-label').textContent =
+      'จังหวัดที่พบข่าวน้ำท่วมใน 3 วันล่าสุด (' + withNews.length + ' จังหวัด)';
+    var chipBox = document.getElementById('newsprov-chips');
+    withNews.forEach(function (p) {
+      var c = h('button', 'chip', p.name);
+      c.type = 'button';
+      c.dataset.n = p.name;
+      c.setAttribute('aria-pressed', 'false');
+      c.addEventListener('click', function () { showProvince(p.name, true); });
+      chipBox.appendChild(c);
+    });
+  }
+
   function cell(label, value, unit) {
     var c = h('div', 'cell');
     c.appendChild(h('div', 'lbl', label));
@@ -304,7 +352,7 @@ footer p{margin:0 0 6px}
     var p = BY[name];
     if (!p) return;
     sel.value = name;
-    document.querySelectorAll('.zc').forEach(function (b) {
+    document.querySelectorAll('.zc, .chip').forEach(function (b) {
       b.setAttribute('aria-pressed', b.dataset.n === name ? 'true' : 'false');
     });
     if (push) {
@@ -318,41 +366,51 @@ footer p{margin:0 0 6px}
     head.appendChild(h('h3', null, name));
     head.appendChild(h('span', 'lbl', p.region));
     head.appendChild(pill(p.level));
+    if (p.news && p.news.length) head.appendChild(newsPill('มีข่าวน้ำท่วม 3 วันล่าสุด'));
     panel.appendChild(head);
 
     var cells = h('div', 'cells');
     cells.appendChild(cell('ฝนพยากรณ์วันนี้', p.rain, 'มม.'));
+    cells.appendChild(cell('ฝนสะสม 3 วัน', p.acc3, 'มม.'));
     cells.appendChild(cell('โอกาสฝนตกสูงสุดวันนี้', p.prob, '%'));
     cells.appendChild(cell('แนวโน้มฝน 7 วัน', p.trend, ''));
     panel.appendChild(cells);
 
-    var max = Math.max.apply(null, p.rain7.concat([1]));
-    var barsWrap = h('div', 'bars-wrap');
+    var max = Math.max.apply(null, p.series.concat([1]));
     var bars = h('div', 'bars');
     bars.setAttribute('role', 'img');
-    bars.setAttribute('aria-label', 'ฝนพยากรณ์ 7 วัน (มม.): ' + p.rain7.map(function (v, i) {
-      return DATA.dayLabels[i] + ' ' + v;
+    bars.setAttribute('aria-label', 'ฝนรายวัน (มม.) แท่งแรกเป็นฝนย้อนหลัง: ' + p.series.map(function (v, i) {
+      var d = DATA.days[i];
+      return d.day + ' ' + d.month + ' ' + v;
     }).join(', '));
-    p.rain7.forEach(function (v, i) {
-      var b = h('div', 'bar');
+    p.series.forEach(function (v, i) {
+      var d = DATA.days[i];
+      var b = h('div', 'bar ' + d.kind);
       b.appendChild(h('span', 'n', v));
       var col = h('span', 'col');
       col.style.height = Math.max(3, Math.round(v / max * 52)) + 'px';
       b.appendChild(col);
-      b.appendChild(h('span', 'd', DATA.dayLabels[i]));
+      var lab = h('span', 'd');
+      lab.appendChild(h('span', 'dd', d.day));
+      lab.appendChild(h('span', 'dm', d.month));
+      b.appendChild(lab);
       bars.appendChild(b);
     });
-    barsWrap.appendChild(bars);
-    panel.appendChild(barsWrap);
+    panel.appendChild(bars);
+    panel.appendChild(h('p', 'note', 'แท่งจางคือฝนย้อนหลัง 3 วัน (ค่าจากโมเดล ไม่ใช่ปริมาณฝนที่วัดจริง) แท่งเข้มคือวันนี้ (ตัวหนา) และฝนพยากรณ์วันถัดไป'));
 
     var th = DATA.thresholds;
-    panel.appendChild(h('p', 'criteria',
-      'ระดับคำนวณจากฝนพยากรณ์วันนี้ตามเกณฑ์ของโปรเจกต์นี้: ต่ำกว่า ' + th.watch + ' มม. = ปกติ, ' +
-      th.watch + ' ถึงต่ำกว่า ' + th.alert + ' มม. = เฝ้าระวัง, ตั้งแต่ ' + th.alert +
-      ' มม. = เตือนภัย (ไม่ใช่ประกาศเตือนภัยอย่างเป็นทางการ)'));
+    panel.appendChild(h('p', 'note',
+      'ระดับคำนวณจากฝนพยากรณ์วันนี้หรือฝนสะสม 3 วัน (วันนี้ + ย้อนหลัง 2 วัน) แล้วแต่ค่าไหนสูงกว่า: ' +
+      'ฝนหนัก = วันนี้ ตั้งแต่ ' + th.watch + ' มม. หรือสะสม ตั้งแต่ ' + th.accWatch + ' มม., ' +
+      'ฝนหนักมาก = วันนี้ ตั้งแต่ ' + th.alert + ' มม. หรือสะสม ตั้งแต่ ' + th.accAlert + ' มม. ' +
+      'เกณฑ์ฝนสะสมเป็นของโปรเจกต์นี้ ระดับนี้บอกเฉพาะปริมาณฝน ไม่ได้บอกว่าพื้นที่กำลังน้ำท่วมหรือไม่'));
 
     panel.appendChild(h('div', 'sub', 'ข่าวเกี่ยวกับ' + name + ' (3 วันล่าสุด)'));
-    panel.appendChild(newsList(p.news, 'ไม่พบข่าวน้ำท่วมของจังหวัดนี้ในช่วง 3 วันล่าสุด หรือรอบนี้ยังไม่ได้ดึงข่าวรายจังหวัด'));
+    var emptyText = DATA.newsFetched
+      ? 'ไม่พบหัวข้อข่าวน้ำท่วมที่ระบุชื่อ' + name + ' ใน 3 วันล่าสุด ซึ่งไม่ได้แปลว่าไม่มีน้ำท่วม โปรดตรวจสอบกับประกาศทางการ'
+      : 'รอบนี้ไม่ได้ดึงข่าวรายจังหวัด';
+    panel.appendChild(newsList(p.news, emptyText));
   }
 
   sel.addEventListener('change', function () { showProvince(sel.value, true); });

@@ -4,6 +4,7 @@ import requests
 
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 BATCH_SIZE = 25
+PAST_DAYS = 3  # จำนวนวันย้อนหลังที่ขอจาก API (ค่าจากโมเดล ไม่ใช่ฝนที่วัดจริง)
 
 
 def _get_json(url, params, attempts=3):
@@ -21,11 +22,12 @@ def _get_json(url, params, attempts=3):
             time.sleep(wait)
 
 
-def fetch_rain_forecast(provinces, days=7):
-    """ดึงฝนพยากรณ์รายวันของทุกจังหวัด
+def fetch_rain_forecast(provinces, days=7, past_days=PAST_DAYS):
+    """ดึงฝนรายวัน (ย้อนหลัง past_days วัน + พยากรณ์ days วัน) ของทุกจังหวัด
 
     คืน list เรียงตามลำดับเดียวกับ provinces
     แต่ละรายการ: {"dates": [...], "rain": [มม./วัน], "prob": [% สูงสุดของวัน]}
+    ลำดับวันที่เริ่มจากวันย้อนหลังไกลสุด ไปจนถึงวันพยากรณ์สุดท้าย
     """
     results = []
     for start in range(0, len(provinces), BATCH_SIZE):
@@ -36,6 +38,7 @@ def fetch_rain_forecast(provinces, days=7):
             "daily": "precipitation_sum,precipitation_probability_max",
             "timezone": "Asia/Bangkok",
             "forecast_days": days,
+            "past_days": past_days,
         }
         data = _get_json(FORECAST_URL, params)
         if isinstance(data, dict):  # ถ้าส่งพิกัดเดียว API จะคืน dict ไม่ใช่ list
